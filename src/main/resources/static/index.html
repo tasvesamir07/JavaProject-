@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            border: none;
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0;
+            font-weight: 600;
+        }
+        #connectionStatus {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .rating {
+            color: #ffc107;
+        }
+        .book-info, .author-info, .publication-info {
+            cursor: pointer;
+        }
+        .book-info:hover, .author-info:hover, .publication-info:hover {
+            background-color: #f1f9ff;
+        }
+        .form-control, .form-select {
+            border-radius: 6px;
+            padding: 10px 15px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        .tab-header {
+            background-color: #f1f5fe;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        .tab-header .nav-link {
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .tab-header .nav-link.active {
+            background-color: #4e73df;
+            color: white;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .section-title {
+            border-bottom: 2px solid #e3e6f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #4e73df;
+        }
+        .book-thumbnail {
+            width: 40px;
+            height: 60px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .book-cover-large {
+            width: 120px;
+            height: 180px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+        .book-cover-large:hover {
+            transform: scale(1.05);
+        }
+        .author-thumbnail {
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .author-profile-large {
+            width: 150px;
+            height: 150px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .table-hover tr {
+            transition: background-color 0.2s ease;
+        }
+        .table-hover tr:hover {
+            background-color: rgba(78, 115, 223, 0.05);
+        }
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .author-book-item, .publication-book-item {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .author-book-item:hover, .publication-book-item:hover {
+            background-color: #f1f9ff;
+            transform: translateX(5px);
+        }
+        .detail-info {
+            margin-bottom: 15px;
+        }
+        .detail-info strong {
+            color: #4e73df;
+        }
+        .contact-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .contact-info-item i {
+            margin-right: 10px;
+            color: #4e73df;
+            width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="connectionStatus" class="alert alert-warning">Checking connection...</div>
+
+<div class="container">
+    <h1 class="text-center mb-4">Book Management System</h1>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-header mb-4">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <a class="nav-link active" id="books-tab" data-bs-toggle="tab" href="#books-content">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="authors-tab" data-bs-toggle="tab" href="#authors-content">Authors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="publications-tab" data-bs-toggle="tab"
+                   href="#publications-content">Publications</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Books Tab -->
+        <div class="tab-pane fade show active" id="books-content">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Books</h5>
+                    <button id="addBookBtn" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Add Book
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="bookSearchInput"
+                                       placeholder="Search books...">
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button id="refreshBooksBtn" class="btn btn-outline-primary">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Publisher</th>
+                                <th>Published Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="booksTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading books...</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authors Tab -->
+        <div class="tab-pane fade" id="authors-content">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Authors</h5>
+                    <button id="addAuthorBtn" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Add Author
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="authorSearchInput"
+                                       placeholder="Search authors...">
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button id="refreshAuthorsBtn" class="btn btn-outline-success">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Profile</th>
+                                <th>Name</th>
+                                <th>Birthdate</th>
+                                <th>Nationality</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="authorsTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading authors...</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Publications Tab -->
+        <div class="tab-pane fade" id="publications-content">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Publications</h5>
+                    <button id="addPublicationBtn" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Add Publication
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="publicationSearchInput"
+                                       placeholder="Search publications...">
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button id="refreshPublicationsBtn" class="btn btn-outline-info">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Founded</th>
+                                <th>Contact</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="publicationsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center">Loading publications...</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Book Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalTitle">Add Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <input type="hidden" id="bookId">
+                    <div class="mb-4">
+                        <h6 class="section-title">Book Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="bookName" class="form-label">Book Title <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="bookName" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="bookAuthor" class="form-label">Author <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="bookAuthor" required>
+                                    <option value="" selected disabled>Select Author</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bookPublication" class="form-label">Publication <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="bookPublication" required>
+                                    <option value="" selected disabled>Select Publication</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publishedDate" class="form-label">Published Date</label>
+                                <input type="date" class="form-control" id="publishedDate">
+                                <small class="text-muted">Format: DD-MM-YYYY</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="bookDescription" rows="4"
+                                      placeholder="Book description..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Cover Image Section -->
+                    <div class="mb-4">
+                        <h6 class="section-title">Book Cover</h6>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="bookCoverImage" class="form-label">Cover Image</label>
+                                    <input type="file" class="form-control" id="bookCoverImage" accept="image/*">
+                                    <small class="text-muted">Max size: 10MB. Supported formats: JPG, PNG, GIF</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div id="imagePreviewContainer" style="display: none;">
+                                    <p class="mb-1">Preview:</p>
+                                    <img id="imagePreview" class="img-fluid border rounded"
+                                         style="max-height: 150px; max-width: 100%; object-fit: cover;" src=""
+                                         alt="Book cover preview">
+                                </div>
+                                <div id="currentCoverContainer" style="display: none;">
+                                    <p class="mb-1">Current Cover:</p>
+                                    <img id="currentCover" class="img-fluid border rounded"
+                                         style="max-height: 150px; max-width: 100%; object-fit: cover;" src=""
+                                         alt="Current book cover">
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeCoverBtn">
+                                            Remove Cover
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Author Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authorModalTitle">Add Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="authorForm">
+                    <input type="hidden" id="authorId">
+
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h6 class="section-title">Basic Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="authorName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="authorName" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="authorBirthdate" class="form-label">Birthdate</label>
+                                <input type="date" class="form-control" id="authorBirthdate">
+                                <small class="text-muted">Format: DD-MM-YYYY</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="authorBirthplace" class="form-label">Birthplace</label>
+                                <input type="text" class="form-control" id="authorBirthplace"
+                                       placeholder="City, Country">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="mb-4">
+                        <h6 class="section-title">Additional Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="authorNationality" class="form-label">Nationality</label>
+                                <input type="text" class="form-control" id="authorNationality">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="authorBiography" class="form-label">Biography</label>
+                            <textarea class="form-control" id="authorBiography" rows="5"
+                                      placeholder="Author's biographical information..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Profile Image Section -->
+                    <div class="mb-4">
+                        <h6 class="section-title">Author Profile Image</h6>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="authorProfileImage" class="form-label">Profile Image</label>
+                                    <input type="file" class="form-control" id="authorProfileImage" accept="image/*">
+                                    <small class="text-muted">Max size: 10MB. Supported formats: JPG, PNG, GIF</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div id="authorImagePreviewContainer" style="display: none;">
+                                    <p class="mb-1">Preview:</p>
+                                    <img id="authorImagePreview" class="img-fluid border rounded-circle"
+                                         style="height: 150px; width: 150px; object-fit: cover;" src=""
+                                         alt="Author profile preview">
+                                </div>
+                                <div id="currentProfileContainer" style="display: none;">
+                                    <p class="mb-1">Current Profile:</p>
+                                    <img id="currentProfile" class="img-fluid border rounded-circle"
+                                         style="height: 150px; width: 150px; object-fit: cover;" src=""
+                                         alt="Current author profile">
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                id="removeProfileBtn">
+                                            Remove Profile Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveAuthorBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Publication Modal -->
+<div class="modal fade" id="publicationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="publicationModalTitle">Add Publication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="publicationForm">
+                    <input type="hidden" id="publicationId">
+
+                    <div class="mb-4">
+                        <h6 class="section-title">Basic Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="publicationName" class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="publicationName" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publicationFounded" class="form-label">Founded Date</label>
+                                <input type="date" class="form-control" id="publicationFounded">
+                                <small class="text-muted">Format: DD-MM-YYYY</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="publicationAddress" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="publicationAddress">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="section-title">Contact Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publicationWebsite" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="publicationWebsite"
+                                       placeholder="https://example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="publicationEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="publicationEmail"
+                                       placeholder="contact@example.com">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publicationPhone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="publicationPhone"
+                                       placeholder="+1 (123) 456-7890">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-info" id="savePublicationBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Book Details Modal with Reviews -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Details & Reviews</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <h4 id="detailsBookTitle"></h4>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="author-thumbnail rounded-circle me-2" id="detailsAuthorImage">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <strong>Author:</strong> <span id="detailsBookAuthor" class="author-link"
+                                                                   style="cursor: pointer;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Publisher:</strong> <span id="detailsBookPublisher" class="publication-link"
+                                                              style="cursor: pointer;"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Published Date:</strong> <span id="detailsPublishedDate"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <p id="detailsBookDescription"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="book-cover-large mb-3" id="bookDetailsCover">
+                            <i class="fas fa-book fa-3x"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Reviews</h5>
+                        <button class="btn btn-primary" id="addReviewBtn">
+                            <i class="fas fa-plus"></i> Add Review
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="reviewsList">
+                            <div class="text-center">Loading reviews...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Author Details Modal -->
+<div class="modal fade" id="authorDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Author Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 id="detailsAuthorName"></h4>
+                        <div class="detail-info">
+                            <strong>Birthdate:</strong> <span id="detailsAuthorBirthdate"></span>
+                        </div>
+                        <div class="detail-info">
+                            <strong>Birthplace:</strong> <span id="detailsAuthorBirthplace"></span>
+                        </div>
+                        <div class="detail-info">
+                            <strong>Nationality:</strong> <span id="detailsAuthorNationality"></span>
+                        </div>
+                        <div class="detail-info">
+                            <strong>Biography:</strong>
+                            <p id="detailsAuthorBiography" class="mt-2"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="author-profile-large mb-3" id="authorDetailsProfile">
+                            <i class="fas fa-user fa-3x"></i>
+                        </div>
+                        <button class="btn btn-sm btn-success" id="editAuthorFromDetailsBtn">
+                            <i class="fas fa-edit"></i> Edit Author
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Publication Details Modal -->
+<div class="modal fade" id="publicationDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Publication Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 id="detailsPublicationName"></h4>
+                        <div class="detail-info">
+                            <strong>Founded:</strong> <span id="detailsPublicationFounded"></span>
+                        </div>
+                        <div class="detail-info">
+                            <strong>Address:</strong> <span id="detailsPublicationAddress"></span>
+                        </div>
+                        <div class="mt-4">
+                            <h6 class="section-title">Contact Information</h6>
+                            <div class="contact-info-item">
+                                <i class="fas fa-globe"></i>
+                                <span id="detailsPublicationWebsite"></span>
+                            </div>
+                            <div class="contact-info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span id="detailsPublicationEmail"></span>
+                            </div>
+                            <div class="contact-info-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="detailsPublicationPhone"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-building fa-5x text-info"></i>
+                        </div>
+                        <button class="btn btn-sm btn-info" id="editPublicationFromDetailsBtn">
+                            <i class="fas fa-edit"></i> Edit Publication
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalTitle">Add Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <input type="hidden" id="reviewBookId">
+                    <input type="hidden" id="reviewId">
+                    <div class="mb-3">
+                        <label for="reviewTitle" class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="reviewTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewRating" class="form-label">Rating (1-5) <span
+                                class="text-danger">*</span></label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range me-2" id="reviewRating" min="1" max="5" value="3"
+                                   required>
+                            <div id="ratingDisplay" class="fs-4">★★★☆☆</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewDescription" class="form-label">Review <span
+                                class="text-danger">*</span></label>
+                        <textarea class="form-control" id="reviewDescription" rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReviewBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage">Are you sure you want to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast for notifications -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Change this to match your Spring Boot backend URL
+    const API_BASE_URL = 'http://localhost:8080';
+
+    // DOM Elements
+    const connectionStatus = document.getElementById('connectionStatus');
+    const booksTableBody = document.getElementById('booksTableBody');
+    const authorsTableBody = document.getElementById('authorsTableBody');
+    const publicationsTableBody = document.getElementById('publicationsTableBody');
+
+    // Modals
+    const bookModal = new bootstrap.Modal(document.getElementById('bookModal'));
+    const authorModal = new bootstrap.Modal(document.getElementById('authorModal'));
+    const publicationModal = new bootstrap.Modal(document.getElementById('publicationModal'));
+    const bookDetailsModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+    const authorDetailsModal = new bootstrap.Modal(document.getElementById('authorDetailsModal'));
+    const publicationDetailsModal = new bootstrap.Modal(document.getElementById('publicationDetailsModal'));
+    const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+
+    // Toast for notifications
+    const notificationToast = new bootstrap.Toast(document.getElementById('notificationToast'));
+
+    // Current IDs for details views
+    let currentBookId = null;
+    let currentAuthorId = null;
+    let currentPublicationId = null;
+    let deleteItemType = null;
+    let deleteItemId = null;
+    let shouldRemoveCover = false;
+    let shouldRemoveProfile = false;
+
+    // Search inputs
+    document.getElementById('bookSearchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterTable('booksTableBody', searchTerm, [1, 2, 3]);
+    });
+
+    document.getElementById('authorSearchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterTable('authorsTableBody', searchTerm, [2, 4]);
+    });
+
+    document.getElementById('publicationSearchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterTable('publicationsTableBody', searchTerm, [1]);
+    });
+
+    // Event Listeners
+    document.getElementById('refreshBooksBtn').addEventListener('click', loadBooks);
+    document.getElementById('refreshAuthorsBtn').addEventListener('click', loadAuthors);
+    document.getElementById('refreshPublicationsBtn').addEventListener('click', loadPublications);
+
+    document.getElementById('addBookBtn').addEventListener('click', setupAddBook);
+    document.getElementById('addAuthorBtn').addEventListener('click', setupAddAuthor);
+    document.getElementById('addPublicationBtn').addEventListener('click', setupAddPublication);
+    document.getElementById('addReviewBtn').addEventListener('click', setupAddReview);
+
+    document.getElementById('saveBookBtn').addEventListener('click', saveBook);
+    document.getElementById('saveAuthorBtn').addEventListener('click', saveAuthor);
+    document.getElementById('savePublicationBtn').addEventListener('click', savePublication);
+    document.getElementById('saveReviewBtn').addEventListener('click', saveReview);
+    document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+    // Event Listeners for Author and Publication Details
+    document.getElementById('editAuthorFromDetailsBtn').addEventListener('click', function() {
+        authorDetailsModal.hide();
+        editAuthor(currentAuthorId);
+    });
+
+    document.getElementById('editPublicationFromDetailsBtn').addEventListener('click', function() {
+        publicationDetailsModal.hide();
+        editPublication(currentPublicationId);
+    });
+
+    // Image related event listeners
+    document.getElementById('bookCoverImage').addEventListener('change', previewImage);
+    document.getElementById('removeCoverBtn').addEventListener('click', function() {
+        shouldRemoveCover = true;
+        document.getElementById('currentCoverContainer').style.display = 'none';
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+        document.getElementById('bookCoverImage').value = '';
+    });
+
+    document.getElementById('authorProfileImage').addEventListener('change', previewAuthorImage);
+    document.getElementById('removeProfileBtn').addEventListener('click', function() {
+        shouldRemoveProfile = true;
+        document.getElementById('currentProfileContainer').style.display = 'none';
+        document.getElementById('authorImagePreviewContainer').style.display = 'none';
+        document.getElementById('authorProfileImage').value = '';
+    });
+
+    // Rating slider
+    document.getElementById('reviewRating').addEventListener('input', updateRatingDisplay);
+
+    // Check connection to backend
+    window.onload = function() {
+        checkBackendConnection();
+    };
+
+    // Image preview function
+    function previewImage() {
+        const fileInput = document.getElementById('bookCoverImage');
+        const preview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const currentCoverContainer = document.getElementById('currentCoverContainer');
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                currentCoverContainer.style.display = 'none';
+                shouldRemoveCover = false;
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+
+    // Author image preview function
+    function previewAuthorImage() {
+        const fileInput = document.getElementById('authorProfileImage');
+        const preview = document.getElementById('authorImagePreview');
+        const previewContainer = document.getElementById('authorImagePreviewContainer');
+        const currentProfileContainer = document.getElementById('currentProfileContainer');
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                currentProfileContainer.style.display = 'none';
+                shouldRemoveProfile = false;
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+
+    function updateRatingDisplay() {
+        const rating = document.getElementById('reviewRating').value;
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            stars += i <= rating ? '★' : '☆';
+        }
+        document.getElementById('ratingDisplay').textContent = stars;
+    }
+
+    function formatAsianDate(dateString) {
+        if (!dateString) return 'N/A';
+
+        try {
+            // Parse the date (handles ISO format and timestamp format)
+            const date = new Date(dateString);
+
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+
+            // Get day, month, year and pad with leading zeros if needed
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = date.getFullYear();
+
+            // Return in DD-MM-YYYY format
+            return `${day}-${month}-${year}`;
+        } catch (e) {
+            console.error('Error formatting date:', e);
+            return 'Invalid Date';
+        }
+    }
+
+    function checkBackendConnection() {
+        connectionStatus.classList.remove('alert-success', 'alert-warning', 'alert-danger');
+        connectionStatus.classList.add('alert-warning');
+        connectionStatus.textContent = 'Checking connection to backend...';
+
+        fetch(`${API_BASE_URL}/book/`)
+            .then(response => {
+                if (response.ok) {
+                    connectionStatus.classList.remove('alert-warning', 'alert-danger');
+                    connectionStatus.classList.add('alert-success');
+                    connectionStatus.textContent = 'Connected to backend';
+
+                    // Load initial data
+                    loadBooks();
+                    loadAuthors();
+                    loadPublications();
+
+                    // Hide status after 3 seconds
+                    setTimeout(() => {
+                        connectionStatus.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Backend responded, but with an error');
+                }
+            })
+            .catch(error => {
+                console.error('Connection error:', error);
+                connectionStatus.classList.remove('alert-warning', 'alert-success');
+                connectionStatus.classList.add('alert-danger');
+                connectionStatus.innerHTML = `
+                    <strong>Connection Failed</strong><br>
+                    Make sure your Spring Boot application is running at ${API_BASE_URL}<br>
+                    <button class="btn btn-sm btn-outline-light mt-2" onclick="checkBackendConnection()">
+                        Try Again
+                    </button>
+                `;
+
+                // Show error messages in tables
+                booksTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Failed to load books. Backend connection error.</td></tr>';
+                authorsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Failed to load authors. Backend connection error.</td></tr>';
+                publicationsTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load publications. Backend connection error.</td></tr>';
+            });
+    }
+
+    function filterTable(tableId, searchTerm, columnIndices) {
+        const tbody = document.getElementById(tableId);
+        const rows = tbody.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+
+            // Skip rows with fewer cells than expected (like "No data" messages)
+            if (cells.length <= 1) continue;
+
+            let foundMatch = false;
+
+            for (let j = 0; j < columnIndices.length; j++) {
+                const cellIndex = columnIndices[j];
+                if (cellIndex < cells.length) {
+                    const cellText = cells[cellIndex].textContent.toLowerCase();
+                    if (cellText.includes(searchTerm)) {
+                        foundMatch = true;
+                        break;
+                    }
+                }
+            }
+
+            row.style.display = foundMatch || searchTerm === '' ? '' : 'none';
+        }
+    }
+
+    // Books Functions
+    function loadBooks() {
+        booksTableBody.innerHTML = '<tr><td colspan="6" class="text-center">Loading books...</td></tr>';
+
+        fetch(`${API_BASE_URL}/book/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load books');
+                }
+                return response.json();
+            })
+            .then(books => {
+                if (books.length === 0) {
+                    booksTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No books found</td></tr>';
+                    return;
+                }
+
+                booksTableBody.innerHTML = '';
+                books.forEach(book => {
+                    const hasCover = book.coverImage != null;
+                    const publishedDate = formatAsianDate(book.publishedDate);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${book.bookId}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="book-thumbnail" data-book-id="${book.bookId}">
+                                    ${hasCover ?
+                                      `<img src="${API_BASE_URL}/book/cover-image/${book.bookId}?t=${new Date().getTime()}"
+                                        alt="${book.bookName}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                      `<i class="fas fa-book"></i>`
+                                    }
+                                </div>
+                                <span class="ms-2 book-info" data-id="${book.bookId}">${book.bookName}</span>
+                            </div>
+                        </td>
+                        <td>
+                            ${book.author ?
+                              `<span class="author-info text-primary" style="cursor: pointer;" data-id="${book.author.authorId}">${book.author.authorName}</span>` :
+                              'N/A'}
+                        </td>
+                        <td>
+                            ${book.publication ?
+                              `<span class="publication-info text-primary" style="cursor: pointer;" data-id="${book.publication.publicationId}">${book.publication.publicationName}</span>` :
+                              'N/A'}
+                        </td>
+                        <td>${publishedDate}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="viewBookDetails(${book.bookId})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editBook(${book.bookId})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('book', ${book.bookId})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    booksTableBody.appendChild(row);
+                });
+
+                // Add click event to book titles
+                document.querySelectorAll('.book-info').forEach(item => {
+                    item.addEventListener('click', () => {
+                        viewBookDetails(item.getAttribute('data-id'));
+                    });
+                });
+
+                // Add click events to author and publication links
+                document.querySelectorAll('.author-info').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering parent row events
+                        viewAuthorDetails(item.getAttribute('data-id'));
+                    });
+                });
+
+                document.querySelectorAll('.publication-info').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering parent row events
+                        viewPublicationDetails(item.getAttribute('data-id'));
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error loading books:', error);
+                booksTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
+                showNotification('Error', error.message);
+            });
+    }
+
+    function viewBookDetails(bookId) {
+        currentBookId = bookId;
+
+        // Fetch book details
+        fetch(`${API_BASE_URL}/book/${bookId}`)
+            .then(response => response.json())
+            .then(book => {
+                document.getElementById('detailsBookTitle').textContent = book.bookName;
+
+                // Set author name and make it clickable
+                const authorElem = document.getElementById('detailsBookAuthor');
+                if (book.author) {
+                    authorElem.textContent = book.author.authorName;
+                    authorElem.setAttribute('data-id', book.author.authorId);
+                    authorElem.classList.add('text-primary');
+
+                    // Add click event to author name
+                    authorElem.onclick = function() {
+                        bookDetailsModal.hide();
+                        viewAuthorDetails(book.author.authorId);
+                    };
+                } else {
+                    authorElem.textContent = 'N/A';
+                    authorElem.removeAttribute('data-id');
+                    authorElem.classList.remove('text-primary');
+                    authorElem.onclick = null;
+                }
+
+                // Set publisher name and make it clickable
+                const publisherElem = document.getElementById('detailsBookPublisher');
+                if (book.publication) {
+                    publisherElem.textContent = book.publication.publicationName;
+                    publisherElem.setAttribute('data-id', book.publication.publicationId);
+                    publisherElem.classList.add('text-primary');
+
+                    // Add click event to publisher name
+                    publisherElem.onclick = function() {
+                        bookDetailsModal.hide();
+                        viewPublicationDetails(book.publication.publicationId);
+                    };
+                } else {
+                    publisherElem.textContent = 'N/A';
+                    publisherElem.removeAttribute('data-id');
+                    publisherElem.classList.remove('text-primary');
+                    publisherElem.onclick = null;
+                }
+
+                // Display published date
+                const publishedDateElem = document.getElementById('detailsPublishedDate');
+                if (book.publishedDate) {
+                    publishedDateElem.textContent = formatAsianDate(book.publishedDate);
+                } else {
+                    publishedDateElem.textContent = 'N/A';
+                }
+
+                document.getElementById('detailsBookDescription').textContent = book.bookDescription || 'No description available';
+
+                // Set the book cover image
+                const bookCoverElement = document.getElementById('bookDetailsCover');
+                if (book.coverImage) {
+                    bookCoverElement.innerHTML = `
+                        <img src="${API_BASE_URL}/book/cover-image/${book.bookId}"
+                            alt="${book.bookName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    `;
+                } else {
+                    bookCoverElement.innerHTML = `<i class="fas fa-book fa-3x"></i>`;
+                }
+
+                // Display author image if available
+                const authorImageElem = document.getElementById('detailsAuthorImage');
+                if (book.author) {
+                    fetch(`${API_BASE_URL}/Author/profile-image/${book.author.authorId}`)
+                        .then(response => {
+                            if (response.ok) {
+                                authorImageElem.innerHTML = `
+                                    <img src="${API_BASE_URL}/Author/profile-image/${book.author.authorId}"
+                                        alt="${book.author.authorName}"
+                                        style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                                `;
+                            } else {
+                                authorImageElem.innerHTML = `<i class="fas fa-user"></i>`;
+                            }
+                        })
+                        .catch(() => {
+                            authorImageElem.innerHTML = `<i class="fas fa-user"></i>`;
+                        });
+                } else {
+                    authorImageElem.innerHTML = `<i class="fas fa-user"></i>`;
+                }
+
+                // Load reviews
+                loadReviews(bookId);
+
+                bookDetailsModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading book details:', error);
+                showNotification('Error', 'Failed to load book details');
+            });
+    }
+
+    function loadReviews(bookId) {
+        const reviewsList = document.getElementById('reviewsList');
+        reviewsList.innerHTML = '<div class="text-center">Loading reviews...</div>';
+
+        fetch(`${API_BASE_URL}/book/${bookId}/reviews/`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return []; // No reviews yet
+                    }
+                    throw new Error('Failed to load reviews');
+                }
+                return response.json();
+            })
+            .then(reviews => {
+                if (!reviews || reviews.length === 0) {
+                    reviewsList.innerHTML = '<div class="text-center">No reviews yet. Add the first review!</div>';
+                    return;
+                }
+
+                reviewsList.innerHTML = '';
+                reviews.forEach(review => {
+                    // Generate star rating
+                    let stars = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= review.rating) {
+                            stars += '<i class="fas fa-star rating"></i>';
+                        } else {
+                            stars += '<i class="far fa-star rating"></i>';
+                        }
+                    }
+
+                    const reviewCard = document.createElement('div');
+                    reviewCard.className = 'card mb-3';
+                    reviewCard.innerHTML = `
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">${review.title}</h6>
+                                <div>${stars}</div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-warning" onclick="editReview(${review.id.bookId}, ${review.id.reviewId})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteReview(${review.id.bookId}, ${review.id.reviewId})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p>${review.description || 'No description provided'}</p>
+                        </div>
+                    `;
+                    reviewsList.appendChild(reviewCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading reviews:', error);
+                reviewsList.innerHTML = `<div class="text-center text-danger">Error loading reviews: ${error.message}</div>`;
+            });
+    }
+
+    // Authors Functions
+    function loadAuthors() {
+        authorsTableBody.innerHTML = '<tr><td colspan="6" class="text-center">Loading authors...</td></tr>';
+
+        fetch(`${API_BASE_URL}/Author/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load authors');
+                }
+                return response.json();
+            })
+            .then(authors => {
+                if (authors.length === 0) {
+                    authorsTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No authors found</td></tr>';
+                    return;
+                }
+
+                authorsTableBody.innerHTML = '';
+                authors.forEach(author => {
+                    const formattedBirthdate = formatAsianDate(author.authorBirthdate);
+                    const hasProfileImage = author.profileImage != null;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${author.authorId}</td>
+                        <td>
+                            <div class="author-thumbnail">
+                                ${hasProfileImage ?
+                                  `<img src="${API_BASE_URL}/Author/profile-image/${author.authorId}" alt="${author.authorName}"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` :
+                                  `<i class="fas fa-user"></i>`
+                                }
+                            </div>
+                        </td>
+                        <td class="author-info" data-id="${author.authorId}">${author.authorName}</td>
+                        <td>${formattedBirthdate}</td>
+                        <td>${author.authorNationality || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="viewAuthorDetails(${author.authorId})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editAuthor(${author.authorId})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('author', ${author.authorId})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    authorsTableBody.appendChild(row);
+                });
+
+                // Add click event to author names
+                document.querySelectorAll('.author-info').forEach(item => {
+                    item.addEventListener('click', () => {
+                        viewAuthorDetails(item.getAttribute('data-id'));
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error loading authors:', error);
+                authorsTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
+                showNotification('Error', error.message);
+            });
+    }
+
+    // Author Details View Function
+    function viewAuthorDetails(authorId) {
+    currentAuthorId = authorId;
+
+    // Fetch author details
+    fetch(`${API_BASE_URL}/Author/${authorId}`)
+        .then(response => response.json())
+        .then(author => {
+            document.getElementById('detailsAuthorName').textContent = author.authorName;
+
+            // Display birthdate if exists
+            const birthdateElem = document.getElementById('detailsAuthorBirthdate');
+            if (author.authorBirthdate) {
+                birthdateElem.textContent = formatAsianDate(author.authorBirthdate);
+            } else {
+                birthdateElem.textContent = 'N/A';
+            }
+
+            // Display other author details
+            document.getElementById('detailsAuthorBirthplace').textContent = author.authorBirthplace || 'N/A';
+            document.getElementById('detailsAuthorNationality').textContent = author.authorNationality || 'N/A';
+            document.getElementById('detailsAuthorBiography').textContent = author.authorBiography || 'No biography available';
+
+            // Set the author profile image
+            const authorProfileElement = document.getElementById('authorDetailsProfile');
+            fetch(`${API_BASE_URL}/Author/profile-image/${authorId}`, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        authorProfileElement.innerHTML = `
+                            <img src="${API_BASE_URL}/Author/profile-image/${authorId}?t=${new Date().getTime()}"
+                                alt="${author.authorName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        `;
+                    } else {
+                        authorProfileElement.innerHTML = `<i class="fas fa-user fa-3x"></i>`;
+                    }
+                })
+                .catch(() => {
+                    authorProfileElement.innerHTML = `<i class="fas fa-user fa-3x"></i>`;
+                });
+
+            // Show the modal
+            authorDetailsModal.show();
+        })
+        .catch(error => {
+            console.error('Error loading author details:', error);
+            showNotification('Error', 'Failed to load author details');
+        });
+}
+
+    // Load Author's Books Function
+    function loadAuthorBooks(authorId) {
+        const booksList = document.getElementById('authorBooksList');
+        booksList.innerHTML = '<div class="text-center">Loading books...</div>';
+
+        fetch(`${API_BASE_URL}/book/author/${authorId}`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return []; // No books for this author
+                    }
+                    throw new Error('Failed to load author\'s books');
+                }
+                return response.json();
+            })
+            .then(books => {
+                if (!books || books.length === 0) {
+                    booksList.innerHTML = '<div class="text-center">This author has no books yet.</div>';
+                    return;
+                }
+
+                booksList.innerHTML = '';
+                books.forEach(book => {
+                    const hasCover = book.coverImage != null;
+                    const publishedDate = formatAsianDate(book.publishedDate);
+
+                    const bookItem = document.createElement('div');
+                    bookItem.className = 'author-book-item d-flex align-items-center';
+                    bookItem.innerHTML = `
+                        <div class="book-thumbnail me-3">
+                            ${hasCover ?
+                                `<img src="${API_BASE_URL}/book/cover-image/${book.bookId}?t=${new Date().getTime()}"
+                                    alt="${book.bookName}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<i class="fas fa-book"></i>`
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${book.bookName}</h6>
+                            <small class="text-muted">Published: ${publishedDate} by ${book.publication ? book.publication.publicationName : 'N/A'}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-primary" onclick="viewBookFromAuthor(${book.bookId})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    `;
+                    booksList.appendChild(bookItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading author\'s books:', error);
+                booksList.innerHTML = `<div class="text-center text-danger">Error loading books: ${error.message}</div>`;
+            });
+    }
+
+    // View Book from Author Details
+    function viewBookFromAuthor(bookId) {
+        authorDetailsModal.hide();
+        viewBookDetails(bookId);
+    }
+
+    // Publications Functions
+    function loadPublications() {
+        publicationsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Loading publications...</td></tr>';
+
+        fetch(`${API_BASE_URL}/publication/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load publications');
+                }
+                return response.json();
+            })
+            .then(publications => {
+                if (publications.length === 0) {
+                    publicationsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No publications found</td></tr>';
+                    return;
+                }
+
+                publicationsTableBody.innerHTML = '';
+                publications.forEach(publication => {
+                    const formattedDate = formatAsianDate(publication.publicationFounded);
+
+                    const contactInfo = [
+                        publication.publicationEmail,
+                        publication.publicationPhone
+                    ].filter(Boolean).join(' / ') || 'N/A';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${publication.publicationId}</td>
+                        <td class="publication-info" data-id="${publication.publicationId}">${publication.publicationName}</td>
+                        <td>${formattedDate}</td>
+                        <td>${contactInfo}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="viewPublicationDetails(${publication.publicationId})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editPublication(${publication.publicationId})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('publication', ${publication.publicationId})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    publicationsTableBody.appendChild(row);
+                });
+
+                // Add click event to publication names
+                document.querySelectorAll('.publication-info').forEach(item => {
+                    item.addEventListener('click', () => {
+                        viewPublicationDetails(item.getAttribute('data-id'));
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error loading publications:', error);
+                publicationsTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${error.message}</td></tr>`;
+                showNotification('Error', error.message);
+            });
+    }
+
+    // Publication Details View Function
+    function viewPublicationDetails(publicationId) {
+    currentPublicationId = publicationId;
+
+    // Fetch publication details
+    fetch(`${API_BASE_URL}/publication/${publicationId}`)
+        .then(response => response.json())
+        .then(publication => {
+            document.getElementById('detailsPublicationName').textContent = publication.publicationName;
+
+            // Display founded date if exists
+            const foundedElem = document.getElementById('detailsPublicationFounded');
+            if (publication.publicationFounded) {
+                foundedElem.textContent = formatAsianDate(publication.publicationFounded);
+            } else {
+                foundedElem.textContent = 'N/A';
+            }
+
+            // Display other publication details
+            document.getElementById('detailsPublicationAddress').textContent = publication.publicationAddress || 'N/A';
+
+            // Contact information with clickable links
+            const websiteElem = document.getElementById('detailsPublicationWebsite');
+            if (publication.publicationWebsite) {
+                websiteElem.innerHTML = `<a href="${publication.publicationWebsite}" target="_blank">${publication.publicationWebsite}</a>`;
+            } else {
+                websiteElem.textContent = 'N/A';
+            }
+
+            const emailElem = document.getElementById('detailsPublicationEmail');
+            if (publication.publicationEmail) {
+                emailElem.innerHTML = `<a href="mailto:${publication.publicationEmail}">${publication.publicationEmail}</a>`;
+            } else {
+                emailElem.textContent = 'N/A';
+            }
+
+            document.getElementById('detailsPublicationPhone').textContent = publication.publicationPhone || 'N/A';
+
+            // Show the modal
+            publicationDetailsModal.show();
+        })
+        .catch(error => {
+            console.error('Error loading publication details:', error);
+            showNotification('Error', 'Failed to load publication details');
+        });
+}
+
+    // Load Publication's Books Function
+    function loadPublicationBooks(publicationId) {
+        const booksList = document.getElementById('publicationBooksList');
+        booksList.innerHTML = '<div class="text-center">Loading books...</div>';
+
+        fetch(`${API_BASE_URL}/book/publication/${publicationId}`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return []; // No books for this publication
+                    }
+                    throw new Error('Failed to load publication\'s books');
+                }
+                return response.json();
+            })
+            .then(books => {
+                if (!books || books.length === 0) {
+                    booksList.innerHTML = '<div class="text-center">This publication has no books yet.</div>';
+                    return;
+                }
+
+                booksList.innerHTML = '';
+                books.forEach(book => {
+                    const hasCover = book.coverImage != null;
+                    const publishedDate = formatAsianDate(book.publishedDate);
+
+                    const bookItem = document.createElement('div');
+                    bookItem.className = 'publication-book-item d-flex align-items-center';
+                    bookItem.innerHTML = `
+                        <div class="book-thumbnail me-3">
+                            ${hasCover ?
+                                `<img src="${API_BASE_URL}/book/cover-image/${book.bookId}?t=${new Date().getTime()}"
+                                    alt="${book.bookName}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<i class="fas fa-book"></i>`
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${book.bookName}</h6>
+                            <small class="text-muted">Author: ${book.author ? book.author.authorName : 'N/A'} | Published: ${publishedDate}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-primary" onclick="viewBookFromPublication(${book.bookId})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    `;
+                    booksList.appendChild(bookItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading publication\'s books:', error);
+                booksList.innerHTML = `<div class="text-center text-danger">Error loading books: ${error.message}</div>`;
+            });
+    }
+
+    // View Book from Publication Details
+    function viewBookFromPublication(bookId) {
+        publicationDetailsModal.hide();
+        viewBookDetails(bookId);
+    }
+
+    function setupAddBook() {
+        document.getElementById('bookModalTitle').textContent = 'Add Book';
+        document.getElementById('bookForm').reset();
+        document.getElementById('bookId').value = '';
+
+        // Reset image preview
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+        document.getElementById('currentCoverContainer').style.display = 'none';
+        document.getElementById('bookCoverImage').value = '';
+        shouldRemoveCover = false;
+
+        // Load authors for dropdown
+        fetch(`${API_BASE_URL}/Author/`)
+            .then(response => response.json())
+            .then(authors => {
+                const authorSelect = document.getElementById('bookAuthor');
+                authorSelect.innerHTML = '<option value="" selected disabled>Select Author</option>';
+
+                authors.forEach(author => {
+                    const option = document.createElement('option');
+                    option.value = author.authorId;
+                    option.textContent = author.authorName;
+                    authorSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading authors:', error);
+                showNotification('Error', 'Failed to load authors for dropdown');
+            });
+
+        // Load publications for dropdown
+        fetch(`${API_BASE_URL}/publication/`)
+            .then(response => response.json())
+            .then(publications => {
+                const publicationSelect = document.getElementById('bookPublication');
+                publicationSelect.innerHTML = '<option value="" selected disabled>Select Publication</option>';
+
+                publications.forEach(publication => {
+                    const option = document.createElement('option');
+                    option.value = publication.publicationId;
+                    option.textContent = publication.publicationName;
+                    publicationSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading publications:', error);
+                showNotification('Error', 'Failed to load publications for dropdown');
+            });
+
+        bookModal.show();
+    }
+
+    function editBook(bookId) {
+        document.getElementById('bookModalTitle').textContent = 'Edit Book';
+        document.getElementById('bookForm').reset();
+        document.getElementById('bookId').value = bookId;
+        shouldRemoveCover = false;
+
+        // Reset image preview
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+        document.getElementById('currentCoverContainer').style.display = 'none';
+        document.getElementById('bookCoverImage').value = '';
+
+        // Fetch book details
+        fetch(`${API_BASE_URL}/book/${bookId}`)
+            .then(response => response.json())
+            .then(book => {
+                document.getElementById('bookName').value = book.bookName;
+                document.getElementById('bookDescription').value = book.bookDescription || '';
+
+                // Set published date if exists
+                if (book.publishedDate) {
+                    const publishedDate = new Date(book.publishedDate);
+                    document.getElementById('publishedDate').value = publishedDate.toISOString().split('T')[0];
+                }
+
+                // Check if book has a cover image
+                if (book.coverImage) {
+                    const currentCover = document.getElementById('currentCover');
+                    currentCover.src = `${API_BASE_URL}/book/cover-image/${book.bookId}`;
+                    document.getElementById('currentCoverContainer').style.display = 'block';
+                }
+
+                // Load authors and set selected
+                fetch(`${API_BASE_URL}/Author/`)
+                    .then(response => response.json())
+                    .then(authors => {
+                        const authorSelect = document.getElementById('bookAuthor');
+                        authorSelect.innerHTML = '<option value="" disabled>Select Author</option>';
+
+                        authors.forEach(author => {
+                            const option = document.createElement('option');
+                            option.value = author.authorId;
+                            option.textContent = author.authorName;
+                            if (book.author && author.authorId === book.author.authorId) {
+                                option.selected = true;
+                            }
+                            authorSelect.appendChild(option);
+                        });
+                    });
+
+                // Load publications and set selected
+                fetch(`${API_BASE_URL}/publication/`)
+                    .then(response => response.json())
+                    .then(publications => {
+                        const publicationSelect = document.getElementById('bookPublication');
+                        publicationSelect.innerHTML = '<option value="" disabled>Select Publication</option>';
+
+                        publications.forEach(publication => {
+                            const option = document.createElement('option');
+                            option.value = publication.publicationId;
+                            option.textContent = publication.publicationName;
+                            if (book.publication && publication.publicationId === book.publication.publicationId) {
+                                option.selected = true;
+                            }
+                            publicationSelect.appendChild(option);
+                        });
+                    });
+
+                bookModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading book details:', error);
+                showNotification('Error', 'Failed to load book details');
+            });
+    }
+
+    function saveBook() {
+        const bookId = document.getElementById('bookId').value;
+        const bookName = document.getElementById('bookName').value;
+        const authorId = document.getElementById('bookAuthor').value;
+        const publicationId = document.getElementById('bookPublication').value;
+        const bookDescription = document.getElementById('bookDescription').value;
+        const publishedDate = document.getElementById('publishedDate').value;
+        const fileInput = document.getElementById('bookCoverImage');
+
+        if (!bookName || !authorId || !publicationId) {
+            showNotification('Warning', 'Please fill all required fields');
+            return;
+        }
+
+        const bookData = {
+            bookName: bookName,
+            bookDescription: bookDescription,
+            publishedDate: publishedDate || null,
+            author: { authorId: parseInt(authorId) },
+            publication: { publicationId: parseInt(publicationId) }
+        };
+
+        // Function to save book data and handle cover image
+        const saveBookAndImage = (bookId) => {
+            console.log("Saving book with ID:", bookId);
+
+            // Check if there's a new image to upload
+            if (fileInput.files && fileInput.files[0]) {
+                console.log("New image detected, preparing to upload");
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+
+                // Upload the image
+                fetch(`${API_BASE_URL}/book/upload-image/${bookId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log("Image upload response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Failed to upload image: ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then((text) => {
+                    console.log("Image upload success:", text);
+                    bookModal.hide();
+                    loadBooks(); // Force a full reload for now
+                    showNotification('Success', 'Book and cover image saved successfully');
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    showNotification('Error', 'Failed to upload image: ' + error.message);
+                });
+            } else if (shouldRemoveCover) {
+                console.log("Removing cover image for book ID:", bookId);
+                // If we should remove the cover, make a DELETE request
+                fetch(`${API_BASE_URL}/book/remove-cover/${bookId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    console.log("Cover removal response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Failed to remove cover image: ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then((text) => {
+                    console.log("Cover removal success:", text);
+                    bookModal.hide();
+                    loadBooks(); // Force a full reload for now
+                    showNotification('Success', 'Book updated and cover removed');
+                })
+                .catch(error => {
+                    console.error('Error removing cover image:', error);
+                    showNotification('Error', 'Failed to remove cover image: ' + error.message);
+                });
+            } else {
+                // No image changes
+                console.log("No image changes for book ID:", bookId);
+                bookModal.hide();
+                loadBooks(); // Force a full reload
+                showNotification('Success', 'Book saved successfully');
+            }
+        };
+
+        if (bookId) {
+            // Update existing book
+            bookData.bookId = parseInt(bookId);
+            console.log("Updating existing book:", bookData);
+
+            fetch(`${API_BASE_URL}/book/${bookId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookData)
+            })
+            .then(response => {
+                console.log("Book update response status:", response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to update book: ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(() => {
+                console.log("Book update successful, now handling image");
+                saveBookAndImage(bookId);
+            })
+            .catch(error => {
+                console.error('Error updating book:', error);
+                showNotification('Error', 'Failed to update book: ' + error.message);
+            });
+        } else {
+            // Create new book
+            console.log("Creating new book:", bookData);
+
+            fetch(`${API_BASE_URL}/book/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookData)
+            })
+            .then(response => {
+                console.log("Book creation response status:", response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to add book: ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(() => {
+                console.log("Book creation successful, getting new book ID");
+                // Get the last added book ID
+                return fetch(`${API_BASE_URL}/book/`);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to retrieve books after adding new book');
+                }
+                return response.json();
+            })
+            .then(books => {
+                // Find the book we just added (should be the one with the highest ID)
+                const newBookId = Math.max(...books.map(book => book.bookId));
+                console.log("New book ID determined:", newBookId);
+                saveBookAndImage(newBookId);
+            })
+            .catch(error => {
+                console.error('Error adding book:', error);
+                showNotification('Error', 'Failed to add book: ' + error.message);
+            });
+        }
+    }
+
+    function setupAddAuthor() {
+        document.getElementById('authorModalTitle').textContent = 'Add Author';
+        document.getElementById('authorForm').reset();
+        document.getElementById('authorId').value = '';
+
+        // Reset image preview
+        document.getElementById('authorImagePreviewContainer').style.display = 'none';
+        document.getElementById('currentProfileContainer').style.display = 'none';
+        document.getElementById('authorProfileImage').value = '';
+        shouldRemoveProfile = false;
+
+        authorModal.show();
+    }
+
+    function editAuthor(authorId) {
+        document.getElementById('authorModalTitle').textContent = 'Edit Author';
+        document.getElementById('authorForm').reset();
+        document.getElementById('authorId').value = authorId;
+        shouldRemoveProfile = false;
+
+        // Reset image preview
+        document.getElementById('authorImagePreviewContainer').style.display = 'none';
+        document.getElementById('currentProfileContainer').style.display = 'none';
+        document.getElementById('authorProfileImage').value = '';
+
+        fetch(`${API_BASE_URL}/Author/${authorId}`)
+            .then(response => response.json())
+            .then(author => {
+                document.getElementById('authorName').value = author.authorName;
+
+                if (author.authorBirthdate) {
+                    const birthdate = new Date(author.authorBirthdate);
+                    const formattedDate = birthdate.toISOString().split('T')[0];
+                    document.getElementById('authorBirthdate').value = formattedDate;
+                }
+
+                document.getElementById('authorBirthplace').value = author.authorBirthplace || '';
+                document.getElementById('authorNationality').value = author.authorNationality || '';
+                document.getElementById('authorBiography').value = author.authorBiography || '';
+
+                // Check if author has a profile image
+                fetch(`${API_BASE_URL}/Author/profile-image/${authorId}`, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            const currentProfile = document.getElementById('currentProfile');
+                            currentProfile.src = `${API_BASE_URL}/Author/profile-image/${authorId}`;
+                            document.getElementById('currentProfileContainer').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking author profile image:', error);
+                    });
+
+                authorModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading author details:', error);
+                showNotification('Error', 'Failed to load author details');
+            });
+    }
+
+    function saveAuthor() {
+        const authorId = document.getElementById('authorId').value;
+        const authorName = document.getElementById('authorName').value;
+        const authorBirthdate = document.getElementById('authorBirthdate').value;
+        const authorBirthplace = document.getElementById('authorBirthplace').value;
+        const authorNationality = document.getElementById('authorNationality').value;
+        const authorBiography = document.getElementById('authorBiography').value;
+        const fileInput = document.getElementById('authorProfileImage');
+
+        if (!authorName) {
+            showNotification('Warning', 'Author name is required');
+            return;
+        }
+
+        const authorData = {
+            authorName: authorName,
+            authorBirthdate: authorBirthdate || null,
+            authorBirthplace: authorBirthplace || '',
+            authorNationality: authorNationality || '',
+            authorBiography: authorBiography || ''
+        };
+
+        // Function to save author data and handle profile image
+        const saveAuthorAndImage = (authorId) => {
+            // Check if there's a new image to upload
+            if (fileInput.files && fileInput.files[0]) {
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+
+                // Upload the image
+                fetch(`${API_BASE_URL}/Author/upload-image/${authorId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to upload image');
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    authorModal.hide();
+                    loadAuthors();
+
+                    // If we're currently viewing this author's details, refresh the view
+                    if (currentAuthorId == authorId) {
+                        viewAuthorDetails(authorId);
+                    }
+
+                    showNotification('Success', 'Author and profile image saved successfully');
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    showNotification('Warning', 'Author saved but image upload failed');
+                });
+            } else if (shouldRemoveProfile) {
+                // If we should remove the profile image
+                fetch(`${API_BASE_URL}/Author/remove-profile-image/${authorId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to remove profile image');
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    authorModal.hide();
+                    loadAuthors();
+
+                    // If we're currently viewing this author's details, refresh the view
+                    if (currentAuthorId == authorId) {
+                        viewAuthorDetails(authorId);
+                    }
+
+                    showNotification('Success', 'Author updated and profile image removed');
+                })
+                .catch(error => {
+                    console.error('Error removing profile image:', error);
+                    showNotification('Warning', 'Author saved but profile image removal failed');
+                });
+            } else {
+                // No image changes
+                authorModal.hide();
+                loadAuthors();
+
+                // If we're currently viewing this author's details, refresh the view
+                if (currentAuthorId == authorId) {
+                    viewAuthorDetails(authorId);
+                }
+
+                showNotification('Success', 'Author saved successfully');
+            }
+        };
+
+        if (authorId) {
+            // Update existing author
+            authorData.authorId = parseInt(authorId);
+
+            fetch(`${API_BASE_URL}/Author/${authorId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(authorData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    saveAuthorAndImage(authorId);
+                } else {
+                    throw new Error('Failed to update author');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating author:', error);
+                showNotification('Error', error.message);
+            });
+        } else {
+            // Create new author
+            fetch(`${API_BASE_URL}/Author/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(authorData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Failed to add author');
+                }
+            })
+            .then(() => {
+                // Get the last added author ID
+                return fetch(`${API_BASE_URL}/Author/`);
+            })
+            .then(response => response.json())
+            .then(authors => {
+                // Find the author we just added (should be the one with the highest ID)
+                const newAuthorId = Math.max(...authors.map(author => author.authorId));
+                saveAuthorAndImage(newAuthorId);
+            })
+            .catch(error => {
+                console.error('Error adding author:', error);
+                showNotification('Error', error.message);
+            });
+        }
+    }
+
+    function setupAddPublication() {
+        document.getElementById('publicationModalTitle').textContent = 'Add Publication';
+        document.getElementById('publicationForm').reset();
+        document.getElementById('publicationId').value = '';
+        publicationModal.show();
+    }
+
+    function editPublication(publicationId) {
+        document.getElementById('publicationModalTitle').textContent = 'Edit Publication';
+        document.getElementById('publicationForm').reset();
+        document.getElementById('publicationId').value = publicationId;
+
+        fetch(`${API_BASE_URL}/publication/${publicationId}`)
+            .then(response => response.json())
+            .then(publication => {
+                document.getElementById('publicationName').value = publication.publicationName;
+
+                if (publication.publicationFounded) {
+                    const foundedDate = new Date(publication.publicationFounded);
+                    const formattedDate = foundedDate.toISOString().split('T')[0];
+                    document.getElementById('publicationFounded').value = formattedDate;
+                }
+
+                document.getElementById('publicationAddress').value = publication.publicationAddress || '';
+                document.getElementById('publicationWebsite').value = publication.publicationWebsite || '';
+                document.getElementById('publicationEmail').value = publication.publicationEmail || '';
+                document.getElementById('publicationPhone').value = publication.publicationPhone || '';
+
+                publicationModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading publication details:', error);
+                showNotification('Error', 'Failed to load publication details');
+            });
+    }
+
+    function savePublication() {
+        const publicationId = document.getElementById('publicationId').value;
+        const publicationName = document.getElementById('publicationName').value;
+        const publicationFounded = document.getElementById('publicationFounded').value;
+        const publicationAddress = document.getElementById('publicationAddress').value;
+        const publicationWebsite = document.getElementById('publicationWebsite').value;
+        const publicationEmail = document.getElementById('publicationEmail').value;
+        const publicationPhone = document.getElementById('publicationPhone').value;
+
+        if (!publicationName) {
+            showNotification('Warning', 'Publication name is required');
+            return;
+        }
+
+        const publicationData = {
+            publicationName: publicationName,
+            publicationFounded: publicationFounded || null,
+            publicationAddress: publicationAddress || '',
+            publicationWebsite: publicationWebsite || '',
+            publicationEmail: publicationEmail || '',
+            publicationPhone: publicationPhone || ''
+        };
+
+        if (publicationId) {
+            // Update existing publication
+            publicationData.publicationId = parseInt(publicationId);
+
+            fetch(`${API_BASE_URL}/publication/${publicationId}/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(publicationData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    publicationModal.hide();
+                    loadPublications();
+
+                    // If we're currently viewing this publication's details, refresh the view
+                    if (currentPublicationId == publicationId) {
+                        viewPublicationDetails(publicationId);
+                    }
+
+                    showNotification('Success', 'Publication updated successfully');
+                } else {
+                    throw new Error('Failed to update publication');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating publication:', error);
+                showNotification('Error', error.message);
+            });
+        } else {
+            // Create new publication
+            fetch(`${API_BASE_URL}/publication/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(publicationData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    publicationModal.hide();
+                    loadPublications();
+                    showNotification('Success', 'Publication added successfully');
+                } else {
+                    throw new Error('Failed to add publication');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding publication:', error);
+                showNotification('Error', error.message);
+            });
+        }
+    }
+
+    // Reviews Functions
+    function setupAddReview() {
+        document.getElementById('reviewModalTitle').textContent = 'Add Review';
+        document.getElementById('reviewForm').reset();
+        document.getElementById('reviewId').value = '';
+        document.getElementById('reviewBookId').value = currentBookId;
+        document.getElementById('reviewRating').value = 3;
+        updateRatingDisplay();
+        reviewModal.show();
+    }
+
+    function editReview(bookId, reviewId) {
+        document.getElementById('reviewModalTitle').textContent = 'Edit Review';
+        document.getElementById('reviewForm').reset();
+        document.getElementById('reviewBookId').value = bookId;
+        document.getElementById('reviewId').value = reviewId;
+
+        fetch(`${API_BASE_URL}/book/${bookId}/reviews/${reviewId}`)
+            .then(response => response.json())
+            .then(review => {
+                document.getElementById('reviewTitle').value = review.title;
+                document.getElementById('reviewRating').value = review.rating;
+                document.getElementById('reviewDescription').value = review.description;
+                updateRatingDisplay();
+
+                reviewModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading review details:', error);
+                showNotification('Error', 'Failed to load review details');
+            });
+    }
+
+    function saveReview() {
+        const bookId = document.getElementById('reviewBookId').value;
+        const reviewId = document.getElementById('reviewId').value;
+        const title = document.getElementById('reviewTitle').value;
+        const rating = document.getElementById('reviewRating').value;
+        const description = document.getElementById('reviewDescription').value;
+
+        if (!title || !description) {
+            showNotification('Warning', 'Please fill all required fields');
+            return;
+        }
+
+        const reviewData = {
+            title: title,
+            rating: parseInt(rating),
+            description: description
+        };
+
+        if (reviewId) {
+            // Update existing review
+            reviewData.id = {
+                bookId: parseInt(bookId),
+                reviewId: parseInt(reviewId)
+            };
+
+            fetch(`${API_BASE_URL}/book/${bookId}/reviews/${reviewId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reviewData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    reviewModal.hide();
+                    loadReviews(bookId);
+                    showNotification('Success', 'Review updated successfully');
+                } else {
+                    throw new Error('Failed to update review');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating review:', error);
+                showNotification('Error', error.message);
+            });
+        } else {
+            // Create new review
+            fetch(`${API_BASE_URL}/book/${bookId}/reviews/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reviewData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    reviewModal.hide();
+                    loadReviews(bookId);
+                    showNotification('Success', 'Review added successfully');
+                } else {
+                    throw new Error('Failed to add review');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding review:', error);
+                showNotification('Error', error.message);
+            });
+        }
+    }
+
+    function deleteReview(bookId, reviewId) {
+        document.getElementById('confirmationMessage').textContent = 'Are you sure you want to delete this review?';
+        deleteItemType = 'review';
+        deleteItemId = { bookId, reviewId };
+        confirmationModal.show();
+    }
+
+    // Delete Functions
+    function deleteItem(type, id) {
+        let message = 'Are you sure you want to delete this item?';
+
+        switch (type) {
+            case 'book':
+                message = 'Are you sure you want to delete this book? This action cannot be undone.';
+                break;
+            case 'author':
+                message = 'Are you sure you want to delete this author? All associated books will also be affected.';
+                break;
+            case 'publication':
+                message = 'Are you sure you want to delete this publication? All associated books will also be affected.';
+                break;
+        }
+
+        document.getElementById('confirmationMessage').textContent = message;
+        deleteItemType = type;
+        deleteItemId = id;
+        confirmationModal.show();
+    }
+
+    function confirmDelete() {
+        if (!deleteItemType || !deleteItemId) {
+            confirmationModal.hide();
+            return;
+        }
+
+        let url = '';
+        let method = 'DELETE';
+
+        switch (deleteItemType) {
+            case 'book':
+                url = `${API_BASE_URL}/book/${deleteItemId}`;
+                break;
+            case 'author':
+                url = `${API_BASE_URL}/Author/${deleteItemId}`;
+                break;
+            case 'publication':
+                url = `${API_BASE_URL}/publication/${deleteItemId}/`;
+                break;
+            case 'review':
+                url = `${API_BASE_URL}/book/${deleteItemId.bookId}/reviews/${deleteItemId.reviewId}`;
+                break;
+        }
+
+        fetch(url, { method: method })
+            .then(response => {
+                if (response.ok) {
+                    confirmationModal.hide();
+
+                    switch (deleteItemType) {
+                        case 'book':
+                            loadBooks();
+                            showNotification('Success', 'Book deleted successfully');
+                            break;
+                        case 'author':
+                            loadAuthors();
+                            loadBooks(); // Reload books since they may reference deleted author
+                            showNotification('Success', 'Author deleted successfully');
+                            break;
+                        case 'publication':
+                            loadPublications();
+                            loadBooks(); // Reload books since they may reference deleted publication
+                            showNotification('Success', 'Publication deleted successfully');
+                            break;
+                        case 'review':
+                            loadReviews(deleteItemId.bookId);
+                            showNotification('Success', 'Review deleted successfully');
+                            break;
+                    }
+                } else {
+                    throw new Error(`Failed to delete ${deleteItemType}`);
+                }
+            })
+            .catch(error => {
+                console.error(`Error deleting ${deleteItemType}:`, error);
+                showNotification('Error', error.message);
+            })
+            .finally(() => {
+                deleteItemType = null;
+                deleteItemId = null;
+            });
+    }
+
+    // Utility Functions
+    function showNotification(title, message) {
+        document.getElementById('toastTitle').textContent = title;
+        document.getElementById('toastMessage').textContent = message;
+
+        // Set toast color based on notification type
+        const toast = document.getElementById('notificationToast');
+        toast.className = 'toast';
+
+        if (title.toLowerCase() === 'success') {
+            toast.classList.add('text-bg-success');
+        } else if (title.toLowerCase() === 'error') {
+            toast.classList.add('text-bg-danger');
+        } else if (title.toLowerCase() === 'warning') {
+            toast.classList.add('text-bg-warning');
+        } else {
+            toast.classList.add('text-bg-primary');
+        }
+
+        notificationToast.show();
+    }
+</script>
