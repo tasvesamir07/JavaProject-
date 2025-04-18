@@ -1,0 +1,41 @@
+{
+  "publicationName": "Cedars House",
+  "publicationAddress": "45 Cedar Avenue, Beirut",
+  "publicationFounded": "12-08-1985",
+  "publicationWebsite": "http://cedarshouse.com",
+  "publicationEmail": "contact@cedarshouse.com",
+  "publicationPhone": "+961-1-987654"
+}
+
+
+
+{
+  "publicationName": "Desert Ink",
+  "publicationAddress": "78 Oasis Road, Riyadh",
+  "publicationFounded": "01-01-2000",
+  "publicationWebsite": "http://desertink.sa",
+  "publicationEmail": "support@desertink.sa",
+  "publicationPhone": "+966-5-6789012"
+}
+
+
+
+{
+  "publicationName": "Atlas Publications",
+  "publicationAddress": "202 Atlas Boulevard, Tunis",
+  "publicationFounded": "19-04-1995",
+  "publicationWebsite": "http://atlaspub.tn",
+  "publicationEmail": "hello@atlaspub.tn",
+  "publicationPhone": "+216-71-234567"
+}
+
+
+
+{
+  "publicationName": "Sandscript Media",
+  "publicationAddress": "9 Pearl Square, Dubai",
+  "publicationFounded": "11-11-2008",
+  "publicationWebsite": "http://sandscript.ae",
+  "publicationEmail": "editor@sandscript.ae",
+  "publicationPhone": "+971-50-1122334"
+}

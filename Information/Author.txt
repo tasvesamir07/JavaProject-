@@ -1,0 +1,103 @@
+
+{
+    "authorName": "Gabriel García Márquez",
+    "authorBirthdate": "1927-03-06",
+    "authorBirthplace": "Aracataca, Colombia",
+    "authorNationality": "Colombian",
+    "authorBiography": "Gabriel García Márquez was a Colombian novelist and Nobel laureate known for popularizing magical realism in works like 'One Hundred Years of Solitude'.",
+    "profileImage": null,
+    "imageContentType": null
+  }  
+
+{
+    "authorName": "George Orwell",
+    "authorBirthdate": "1903-06-25",
+    "authorBirthplace": "Motihari, India",
+    "authorNationality": "British",
+    "authorBiography": "George Orwell was a novelist and journalist best known for '1984' and 'Animal Farm', which critique totalitarianism and authoritarian regimes.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Jane Austen",
+    "authorBirthdate": "1775-12-16",
+    "authorBirthplace": "Steventon, Hampshire, England",
+    "authorNationality": "British",
+    "authorBiography": "Jane Austen was an English novelist known for her romantic fiction set among the British landed gentry, including 'Pride and Prejudice' and 'Sense and Sensibility'.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Haruki Murakami",
+    "authorBirthdate": "1949-01-12",
+    "authorBirthplace": "Kyoto, Japan",
+    "authorNationality": "Japanese",
+    "authorBiography": "Haruki Murakami is a contemporary Japanese writer known for blending surrealism and realism in novels like 'Norwegian Wood' and 'Kafka on the Shore'.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Chinua Achebe",
+    "authorBirthdate": "1930-11-16",
+    "authorBirthplace": "Ogidi, Nigeria",
+    "authorNationality": "Nigerian",
+    "authorBiography": "Chinua Achebe was a Nigerian novelist and poet, best known for 'Things Fall Apart', which is widely regarded as the cornerstone of modern African literature.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Leo Tolstoy",
+    "authorBirthdate": "1828-09-09",
+    "authorBirthplace": "Yasnaya Polyana, Russia",
+    "authorNationality": "Russian",
+    "authorBiography": "Leo Tolstoy was a Russian writer famed for his epic novels 'War and Peace' and 'Anna Karenina', exploring themes of morality, family, and society.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Isabel Allende",
+    "authorBirthdate": "1942-08-02",
+    "authorBirthplace": "Lima, Peru",
+    "authorNationality": "Chilean",
+    "authorBiography": "Isabel Allende is a Chilean-American writer whose novels, such as 'The House of the Spirits', often include elements of magical realism.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  
+
+  {
+    "authorName": "Margaret Atwood",
+    "authorBirthdate": "1939-11-18",
+    "authorBirthplace": "Ottawa, Canada",
+    "authorNationality": "Canadian",
+    "authorBiography": "Margaret Atwood is a Canadian author and poet best known for her dystopian novel 'The Handmaid's Tale'.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Franz Kafka",
+    "authorBirthdate": "1883-07-03",
+    "authorBirthplace": "Prague, Czech Republic",
+    "authorNationality": "Austro-Hungarian (now Czech)",
+    "authorBiography": "Franz Kafka was a German-speaking Bohemian writer known for existential and surreal stories like 'The Metamorphosis' and 'The Trial'.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+
+  {
+    "authorName": "Toni Morrison",
+    "authorBirthdate": "1931-02-18",
+    "authorBirthplace": "Lorain, Ohio, USA",
+    "authorNationality": "American",
+    "authorBiography": "Toni Morrison was an American novelist and Nobel Prize winner best known for her powerful exploration of Black identity in works like 'Beloved'.",
+    "profileImage": null,
+    "imageContentType": null
+  }
+]

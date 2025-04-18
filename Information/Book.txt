@@ -1,0 +1,60 @@
+{
+  "bookName": "Echoes in the Canyon",
+  "bookDescription": "A young musician discovers her grandmother's hidden past in a war-torn Europe.",
+  "publishedDate": "2003-09-14",
+  "publication": {
+    "publicationId": 1
+  },
+  "author": {
+    "authorId": 3
+  }
+}
+
+{
+  "bookName": "Beneath Frozen Skies",
+  "bookDescription": "In the Arctic Circle, a research team uncovers secrets that should have stayed buried.",
+  "publishedDate": "2011-12-03",
+  "publication": {
+    "publicationId": 4
+  },
+  "author": {
+    "authorId": 1
+  }
+}
+
+{
+  "bookName": "Threads of Silk and Steel",
+  "bookDescription": "An epic tale of rebellion and resilience in a divided empire.",
+  "publishedDate": "2016-04-22",
+  "publication": {
+    "publicationId": 3
+  },
+  "author": {
+    "authorId": 5
+  }
+}
+
+{
+  "bookName": "The Last Ember",
+  "bookDescription": "A forgotten manuscript holds the key to an ancient civilization's last hope.",
+  "publishedDate": "2008-07-15",
+  "publication": {
+    "publicationId": 2
+  },
+  "author": {
+    "authorId": 4
+  }
+}
+
+{
+  "bookName": "Shadows Over Raventon",
+  "bookDescription": "Detective Eliza Moore returns to her hometown to confront the darkness lurking in the woods.",
+  "publishedDate": "2019-10-30",
+  "publication": {
+    "publicationId": 5
+  },
+  "author": {
+    "authorId": 2
+  }
+}
+

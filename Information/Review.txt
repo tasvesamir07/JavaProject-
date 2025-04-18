@@ -1,0 +1,37 @@
+{
+  "title": "A Thrilling Masterpiece",
+  "description": "Whispers of the Nile combines history and suspense, making it impossible to put down.",
+  "rating": 4.9
+}
+
+
+{
+  "title": "A Journey Through Time",
+  "description": "Echoes in the Andes takes you on a thrilling adventure with a beautiful backdrop of history.",
+  "rating": 4.8
+}
+
+
+{
+  "title": "Mystery Unveiled",
+  "description": "The Forgotten Manuscript kept me guessing until the very last page. A must-read for mystery lovers.",
+  "rating": 4.6
+}
+
+{
+  "title": "Unforgettable Journey",
+  "description": "Echoes in the Canyon paints a vivid picture of love and loss across generations.",
+  "rating": 4.8
+}
+
+{
+  "title": "A Chilling Ride",
+  "description": "Beneath Frozen Skies keeps you on the edge of your seat with its icy twists and haunting revelations.",
+  "rating": 4.7
+}
+
+{
+  "title": "Masterclass in Storytelling",
+  "description": "The Last Ember is a literary gem—cleverly plotted and emotionally powerful.",
+  "rating": 5.0
+}
